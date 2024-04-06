@@ -1,5 +1,5 @@
 import pygame
-from Frontend.Settings import END_SONG_DELAY, KEY_BINDS
+from Frontend.Settings import END_SONG_DELAY, KEY_BINDS, IMPORT_MAP
 from Frontend.Mania_Window.Interfaces import GameModeWindow
 from Frontend.Mania_Window.Rectangle import Rectangle
 from Frontend.Mania_Window.Misc import Font, MapStatus
@@ -35,6 +35,7 @@ class ManiaPlayWindow(GameModeWindow):
         self.event_handler = ManiaEventHandler(play_window=self, window_manager=window_manager)
 
     def run(self):
+        self.timer.debug()
         self.background_setup()
         self.timer.compute_if_finish_timer()
         self.rectangle.run(current_time=self.timer.current_time, pause=self.pause.is_paused)
@@ -145,13 +146,16 @@ class ManiaEventHandler(WindowEventHandler):
         self.__window_manager.show_main_menu()
 
     def __check_map_if_finished(self):
-        if (self.__play_window.timer.timer_finished or self.__play_window.map_status.finished) and \
-                not (self.__play_window.map_status.failed and not self.__play_window.pause.is_paused):
-            self.__play_window.map_status.finished = True
-            self.__play_window.play_tracker.update_plays(self.__play_window.combo_counter.get_stats)
-            self.__play_window.music.fade_music()
-            self.__play_window.show_end_screen()
-            self.__play_window.map_manager.overwrite_map()
+        if not ((self.__play_window.timer.timer_finished or self.__play_window.map_status.finished) and
+                not (self.__play_window.map_status.failed or self.__play_window.pause.is_paused)):
+            return
+        self.__play_window.map_status.finished = True
+        self.__play_window.play_tracker.update_plays(self.__play_window.combo_counter.get_stats)
+        self.__play_window.music.fade_music()
+        self.__play_window.show_end_screen()
+        if IMPORT_MAP:
+            return
+        self.__play_window.map_manager.overwrite_map()
 
     def __check_window_if_paused(self):
         if self.__play_window.pause.is_paused:

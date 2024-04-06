@@ -1,7 +1,7 @@
 from pygame import Rect, draw
-from Frontend.Settings import IMPORT_MAP, Color
+from Frontend.Settings import Color
 from Frontend.Mania_Window.Stats.Combo.combo import ComboCounter
-from Frontend.Mania_Window.Rectangle.lane_manager import LaneManager, ImportCircles
+from Frontend.Mania_Window.Rectangle.lane_manager import LaneManager
 from Frontend.Mania_Window.Stats.Show_Acc.show_acc import ShowAcc
 from Backend.Timer import IntervalTimer
 
@@ -15,16 +15,13 @@ class Rectangle:
         self.show_acc: ShowAcc = show_acc
         self.map_status = map_status
         self.combo_counter = combo_counter
-        self.map_manager = maps
-        self.imported = IMPORT_MAP
         self.rect = Rect(self.__pos.rectangle_x, 0, self.__pos.rectangle_width, self.__pos.rectangle_height)
         self.lane_manager: LaneManager = LaneManager(window=self.__pos.window, display=display,
-                                                     timer=mini_timer, rectangle_pos=self.__pos)
-        self.import_circle_manager = ImportCircles(self.lane_manager)
+                                                     timer=mini_timer, rectangle_pos=self.__pos, map_manager=maps)
 
     def run(self, current_time: int, pause: bool):
         if not pause and not self.map_status.failed_or_finished:
-            self.lane_manager.init_fall_circles(map_manager=self.map_manager, current_time=current_time)
+            self.lane_manager.init_fall_circles(current_time=current_time)
             self.check_circles_if_out()
         self.show(pause=pause)
 
@@ -43,9 +40,8 @@ class Rectangle:
         self.__update_circles()
 
     def restart(self):
+        self.lane_manager.restart()
         self.lane_manager.clear_all_circles()
-        if self.imported:
-            self.import_circle_manager.reset()
 
     def __update_circles(self):
         if self.map_status.failed_or_finished:

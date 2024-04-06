@@ -6,7 +6,6 @@ from .hover_animation import HoverAnimation
 
 class MapBarAnimation:
     __SPEED_PER_FRAME = 0.1
-    __hovered = False
 
     def __init__(self, is_chosen: bool, map_bar_pos):
         self.__chosen = is_chosen

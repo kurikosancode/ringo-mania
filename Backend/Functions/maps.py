@@ -5,6 +5,7 @@ class MapManager:
     def __init__(self, map_info):
         self.__map_info = map_info
         self.__map_list = []
+        self.__imported_map = []
 
     def overwrite_map(self):
         with open(self.__path, 'w') as file:
@@ -23,16 +24,21 @@ class MapManager:
         return path.join("Backend\Maps", f"{self.__map_info.song_name}.rin")
 
     def import_map(self):
-        self.__map_list.clear()
+        imported_map_list = []
         if not path.exists(self.__path):
             raise Exception("File Not Found")
         with open(self.__path, "r") as map_file:
             for lines in map_file:
-                self.__map_list.append(lines.strip())
-        return reversed(self.__map_list)
+                imported_map_list.append(eval(lines.strip()))
+        self.__imported_map = list(reversed(imported_map_list))
 
     def reset_map_list(self) -> None:
         self.__map_list.clear()
+        self.__imported_map.clear()
+
+    @property
+    def imported_map(self):
+        return self.__imported_map
 
     @staticmethod
     def add_decimal(num: int):

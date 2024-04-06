@@ -2,6 +2,7 @@ from Frontend.Mania_Window.Rectangle.lane import Lane
 from .Circles import CircleImage
 from random import randrange, getrandbits
 from Backend.Timer import IntervalTimer
+from Frontend.Settings import IMPORT_MAP
 
 
 class LaneManager:
@@ -12,8 +13,10 @@ class LaneManager:
         "3": 6,
         "4": 8,
     }
+    __finished_importing = False
+    __current_index = 0
 
-    def __init__(self, window, display, rectangle_pos, timer: IntervalTimer):
+    def __init__(self, window, display, rectangle_pos, timer: IntervalTimer, map_manager):
         self.lane_circle_manager = LaneCircleManager(display=display, rectangle_pos=rectangle_pos)
         self.lanes_taken = []
         self.__circle_image_manager = CircleImage()
@@ -23,23 +26,50 @@ class LaneManager:
                               Lane(x=lane_coord[2], circle_image_manager=self.__circle_image_manager),
                               Lane(x=lane_coord[3], circle_image_manager=self.__circle_image_manager)]
         self.window = window
-        self.mini_timer: IntervalTimer = timer
-        self.set_up_timer_interval()
+        self.__interval_timer: IntervalTimer = timer
+        self.__set_up_timer_interval()
+        self.__map_manager = map_manager
 
-    def set_up_timer_interval(self):
-        self.mini_timer.change_interval(interval=self.lane_circle_manager.interval)
+    def __set_up_timer_interval(self, ms_interval=None):
+        if ms_interval is None:
+            ms_interval = self.lane_circle_manager.interval
+        self.__interval_timer.change_interval(interval=ms_interval)
 
-    def init_fall_circles(self, map_manager, current_time: int):
-        if self.mini_timer.time_interval_finished():
-            self.reset_lanes_taken()
-            if self.slider_chance():
-                self.init_sliders()
-            self.add_a_circle_to_a_lane(self.lane_setter())
-            self.multiple_circles_process()
-            map_manager.convert_to_map_list(self.lanes_taken, current_time)
+    def init_fall_circles(self, current_time: int):
+        if IMPORT_MAP:
+            self.__init_with_import()
+        else:
+            self.__init_without_import(current_time=current_time)
+
+    def __init_without_import(self, current_time: int):
+        if not self.__interval_timer.time_interval_finished():
+            return
+        self.reset_lanes_taken()
+        if self.slider_chance():
+            self.init_sliders()
+        self.add_a_circle_to_a_lane(self.lane_setter())
+        self.multiple_circles_process()
+        self.__map_manager.convert_to_map_list(self.lanes_taken, current_time)
+
+    def __init_with_import(self):
+        self.__check_if_init_import()
+        if not self.__interval_timer.time_interval_finished():
+            return
+        for index, lane in enumerate(self.__map_manager.imported_map[self.__current_index]):
+            if lane == "O":
+                self.add_a_circle_to_a_lane(lane=index)
+        self.__current_index += 1
+
+    def __check_if_init_import(self):
+        if self.__finished_importing:
+            return
+        self.__map_manager.import_map()
+        ms_interval = float(self.__map_manager.imported_map[1][4].removesuffix("s")) * 1000
+        self.__set_up_timer_interval(ms_interval=ms_interval)
+        self.__finished_importing = True
 
     def init_sliders(self):
-        if self.mini_timer.time_interval_finished():
+        if self.__interval_timer.time_interval_finished():
             self.reset_lanes_taken()
             self.check_for_sliders()
             self.check_if_end_sliders()
@@ -141,6 +171,10 @@ class LaneManager:
                                                              speed=self.lane_circle_manager.circle_speed):
             return self.lane_circle_manager.determine_acc(circle_y)
 
+    def restart(self):
+        self.__current_index = 0
+        self.__finished_importing = False
+
 
 class LaneCircleManager:
     __CIRCLE_SIZE_TO_RECT_WIDTH = 3.92
@@ -174,7 +208,7 @@ class LaneCircleManager:
     @property
     def circle_speed(self):
         # FALLING_SPEED + self.circle_size // SPEED_RATIO
-        return 24
+        return 28
 
     @property
     def interval(self):
@@ -258,7 +292,7 @@ class CircleHitWindow:
         }
 
 
-class ImportCircles:
+class ImportManager:
     def __init__(self, lane_manager):
         self.imported_lanes_index = 0
         self.imported_lanes = []

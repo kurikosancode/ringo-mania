@@ -162,24 +162,24 @@ class DelayTimer:
 
 class IntervalTimer:
     def __init__(self, interval: int = 100):
-        self.last_time: int = time.get_ticks()
-        self.interval = interval
+        self.__last_time: int = time.get_ticks()
+        self.__interval = interval
 
     def time_interval_finished(self) -> bool:
         current_time = time.get_ticks()
-        if current_time - self.last_time >= self.interval:
-            self.last_time = current_time
+        if current_time - self.__last_time >= self.__interval:
+            self.__last_time = current_time
             return True
         return False
 
     def debug(self):
         print("Debugging: ")
         print(f"current time: {time.get_ticks()}")
-        print(f"last time: {self.last_time}")
-        print(f"interval: {self.interval}\n")
+        print(f"last time: {self.__last_time}")
+        print(f"interval: {self.__interval}\n")
 
     def change_interval(self, interval):
-        self.interval = interval
+        self.__interval = interval
 
 
 class ActivationTimer:

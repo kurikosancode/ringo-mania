@@ -21,8 +21,12 @@ class Music:
         self.__timer: TargetTimer = TargetTimer()
         self.__map_info = map_info
         self.__song_checker = SongChecker()
-        mixer.init()
+        self.__init_pygame_music()
         self.__init_all_songs()
+
+    @staticmethod
+    def __init_pygame_music():
+        mixer.init()
 
     def __init_all_songs(self):
         for song in self.__song_checker.get_all_songs():
