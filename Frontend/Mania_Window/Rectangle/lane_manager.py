@@ -7,6 +7,7 @@ from Frontend.Settings import IMPORT_MAP
 
 class LaneManager:
     __NUM_OF_LANES = 4
+    __IMPORT_INTERVAL = 40
     __MULTIPLE_CIRCLE_CHANCE = {
         "Slider": 2,
         "2": 2,
@@ -14,9 +15,8 @@ class LaneManager:
         "4": 8,
     }
     __finished_importing = False
-    __current_index = 0
 
-    def __init__(self, window, display, rectangle_pos, timer: IntervalTimer, map_manager):
+    def __init__(self, window, display, rectangle_pos, map_manager):
         self.lane_circle_manager = LaneCircleManager(display=display, rectangle_pos=rectangle_pos)
         self.lanes_taken = []
         self.__circle_image_manager = CircleImage()
@@ -26,7 +26,7 @@ class LaneManager:
                               Lane(x=lane_coord[2], circle_image_manager=self.__circle_image_manager),
                               Lane(x=lane_coord[3], circle_image_manager=self.__circle_image_manager)]
         self.window = window
-        self.__interval_timer: IntervalTimer = timer
+        self.__interval_timer = IntervalTimer()
         self.__set_up_timer_interval()
         self.__map_manager = map_manager
 
@@ -55,17 +55,20 @@ class LaneManager:
         self.__check_if_init_import()
         if not self.__interval_timer.time_interval_finished():
             return
-        for index, lane in enumerate(self.__map_manager.imported_map[self.__current_index]):
-            if lane == "O":
-                self.add_a_circle_to_a_lane(lane=index)
-        self.__current_index += 1
+        try:
+            for index, lane in enumerate(next(self.__map_manager.imported_map)):
+                if lane == "O":
+                    self.add_a_circle_to_a_lane(lane=index)
+        except StopIteration:
+            return
 
     def __check_if_init_import(self):
         if self.__finished_importing:
             return
         self.__map_manager.import_map()
-        ms_interval = float(self.__map_manager.imported_map[1][4].removesuffix("s")) * 1000
-        self.__set_up_timer_interval(ms_interval=ms_interval)
+        for _ in range(7):
+            next(self.__map_manager.imported_map)
+        self.__set_up_timer_interval(ms_interval=self.__IMPORT_INTERVAL)  # The interval is 40 because 50 doesn't work
         self.__finished_importing = True
 
     def init_sliders(self):
@@ -172,7 +175,6 @@ class LaneManager:
             return self.lane_circle_manager.determine_acc(circle_y)
 
     def restart(self):
-        self.__current_index = 0
         self.__finished_importing = False
 
 
@@ -208,7 +210,7 @@ class LaneCircleManager:
     @property
     def circle_speed(self):
         # FALLING_SPEED + self.circle_size // SPEED_RATIO
-        return 28
+        return 25
 
     @property
     def interval(self):

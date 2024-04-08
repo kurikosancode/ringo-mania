@@ -30,7 +30,7 @@ class MapManager:
         with open(self.__path, "r") as map_file:
             for lines in map_file:
                 imported_map_list.append(eval(lines.strip()))
-        self.__imported_map = list(reversed(imported_map_list))
+        self.__imported_map = reversed(imported_map_list)
 
     def reset_map_list(self) -> None:
         self.__map_list.clear()

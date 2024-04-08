@@ -1,5 +1,5 @@
 import pygame
-from Backend import Music, MapManager, PlayTracker, MapInfo, ProfileImageManager, PlayerTracker
+from Backend import Music, PlayTracker, MapInfo, ProfileImageManager, PlayerTracker
 from Backend.Timer import TargetTimer
 from Frontend.Main_Menu import MainMenu
 from Frontend.Mania_Window import ManiaPlayWindow
@@ -21,7 +21,7 @@ class Main:
         self.__main_menu = MainMenu(display=self.__display, window_manager=self.__window_manager,
                                     map_info=self.__map_info, play_tracker=self.__play_tracker, music=self.__music,
                                     profile_image_manager=ProfileImageManager(), player_tracker=PlayerTracker())
-        self.__play_window = ManiaPlayWindow(music=self.__music, timer=self.__timer, map_manager=MapManager,
+        self.__play_window = ManiaPlayWindow(music=self.__music, timer=self.__timer,
                                              play_tracker=self.__play_tracker,
                                              map_info=self.__map_info, display=self.__display,
                                              window_manager=self.__window_manager)

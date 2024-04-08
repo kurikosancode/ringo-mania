@@ -3,21 +3,19 @@ from Frontend.Settings import Color
 from Frontend.Mania_Window.Stats.Combo.combo import ComboCounter
 from Frontend.Mania_Window.Rectangle.lane_manager import LaneManager
 from Frontend.Mania_Window.Stats.Show_Acc.show_acc import ShowAcc
-from Backend.Timer import IntervalTimer
 
 
 class Rectangle:
     __RECT_COLOR = Color.PURPLE
 
-    def __init__(self, *, show_acc, maps, display, combo_counter: ComboCounter,
-                 mini_timer: IntervalTimer, map_status):
+    def __init__(self, *, show_acc, maps, display, combo_counter: ComboCounter, map_status):
         self.__pos = RectanglePos(display=display)
         self.show_acc: ShowAcc = show_acc
         self.map_status = map_status
         self.combo_counter = combo_counter
         self.rect = Rect(self.__pos.rectangle_x, 0, self.__pos.rectangle_width, self.__pos.rectangle_height)
         self.lane_manager: LaneManager = LaneManager(window=self.__pos.window, display=display,
-                                                     timer=mini_timer, rectangle_pos=self.__pos, map_manager=maps)
+                                                     rectangle_pos=self.__pos, map_manager=maps)
 
     def run(self, current_time: int, pause: bool):
         if not pause and not self.map_status.failed_or_finished:
