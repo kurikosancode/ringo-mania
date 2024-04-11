@@ -20,15 +20,15 @@ class ManiaPlayWindow(GameModeWindow):
         self.record = Record(font=self.font, display=self.display)
         self.map_manager = MapManager(map_info=map_info)
         self.combo_counter = ComboCounter(font=self.font)
-        self.circle_interval_timer = IntervalTimer()
         self.show_acc = ShowAcc()
+        self.__interval_timer = IntervalTimer()
         self.map_status = MapStatus(imported=IMPORT_MAP)
-        self.pause = Pause(music=self.music, mini_timer=self.circle_interval_timer, font=self.font, state=self.state,
-                           pause_timer=self.timer.pause_timer)
+        self.pause = Pause(music=self.music, font=self.font, state=self.state,
+                           pause_timer=self.timer.pause_timer, interval_timer=self.__interval_timer)
         self.end_screen = EndScreen(window_size=self.display.get_window_size, state=self.state, map_info=map_info)
         self.rectangle = Rectangle(maps=self.map_manager,
                                    display=self.display, combo_counter=self.combo_counter, map_status=self.map_status,
-                                   show_acc=self.show_acc)
+                                   show_acc=self.show_acc, interval_timer=self.__interval_timer)
         self.stats = Stats(display=self.display, rectangle_pos=self.rectangle.pos_class)
         self.event_handler = ManiaEventHandler(play_window=self, window_manager=window_manager,
                                                map_manager=self.map_manager, display=display,

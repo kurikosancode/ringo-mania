@@ -181,6 +181,9 @@ class IntervalTimer:
     def change_interval(self, interval):
         self.__interval = interval
 
+    def add_to_last_time(self, add_time):
+        self.__last_time += add_time
+
 
 class ActivationTimer:
     def __init__(self, interval: int = 100):

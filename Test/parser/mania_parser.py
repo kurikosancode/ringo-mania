@@ -1,6 +1,6 @@
 class OsuFileParser:
     __LANE_LIST = [64, 192, 320, 448]
-    __OUTPUT_FILE = "osu_parsed_correct.txt"
+    __OUTPUT_FILE = "300 Nuts.rin"
     __OSU_FILE = "osu.osu"
     __ENCODING = 'utf-8'
     __INTERVAL = 0.05
@@ -31,15 +31,19 @@ class OsuFileParser:
                     elements = line.strip().split(',')
                     lane_number = int(elements[0])
                     time = int(elements[2])
-                    for offset, mpb in self.__timing_points.items():
-                        if offset <= time:
-                            time += mpb * (time - offset)
-                    time_seconds = round(time / 200000, 2)
+                    time_seconds = round(time / 1000, 2)
                     note_type = 'S' if int(elements[3]) == 128 else 'O'
                     self.__add_parsed_lines(time=time_seconds, note_type=note_type, lane_number=lane_number)
         parsed_lines = list(self.__parsed_lines_dict.values())
         filtered_parsed_lines = self.__add_interval(parsed_lines=parsed_lines)
         self.__save_parsed_file(parsed_lines=reversed(filtered_parsed_lines))
+
+    def __offset(self, time):
+        for offset, mpb in self.__timing_points.items():
+            if offset <= time:
+                time += mpb * (time - offset)
+                break
+        return time
 
     def __reset(self):
         self.__parsed_lines_dict.clear()
@@ -74,7 +78,7 @@ class OsuFileParser:
     def __add_parsed_lines(self, time, lane_number, note_type):
         if time in self.__parsed_lines_dict:
             for index in range(4):
-                if lane_number == index * 64:
+                if lane_number == self.__LANE_LIST[index]:
                     self.__parsed_lines_dict[time][index] = note_type
                     return
         self.__parsed_lines_dict[time] = [note_type if lane_number == self.__LANE_LIST[i] else ' ' for i in range(4)] \

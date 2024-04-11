@@ -10,14 +10,14 @@ class Pause:
     __PAUSE_INTERVAL = 150
     __BACKGROUND_COLOR = Color.BLACK
 
-    def __init__(self, music: Music, mini_timer, font: Font, state, pause_timer):
+    def __init__(self, music: Music, font: Font, state, pause_timer, interval_timer):
         self.__starting_time: int = 0
         self.__paused = False
         self.__music = music
         self.__opacity = Opacity()
         self.__pos = PausePos()
         self.__pause_timer = pause_timer
-        self.__mini_timer = mini_timer
+        self.__interval_timer = interval_timer
         self.__stopwatch = StopwatchTimer()
         self.__state = state
         self.__pause_surface = Surface((WIDTH, HEIGHT), SRCALPHA)
@@ -81,7 +81,7 @@ class Pause:
 
     def unpause(self) -> None:
         self.__music.unpause_music()
-        self.__mini_timer.last_time += self.__stopwatch.get_time_spent()
+        self.__interval_timer.add_to_last_time(add_time=self.__stopwatch.get_time_spent())
         self.__paused = False
         mouse.set_visible(False)
 
