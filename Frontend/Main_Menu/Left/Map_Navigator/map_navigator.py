@@ -1,4 +1,5 @@
 from random import shuffle
+from threading import Thread
 from Backend.Map_Info.Map_Songs.songs_checker import SongChecker
 from .Map_Bar import MapBar, MapIndexManager
 from .Search_Bar import SearchBar
@@ -122,14 +123,15 @@ class MapNavInitializer:
         if not (song_list := self.__song_checker.get_all_songs()):
             return
         shuffle(song_list)
-        self.__init_bar_list(song_list=song_list)
+        self.__init_all_map_bar(song_list=song_list)
         self.__set_index(len_of_song_list=len(song_list))
         self.set_map_info_and_image()
         self.__pos.set_y(index=self.__view_counter.current_top_view)
 
-    def __init_bar_list(self, song_list):
+    def __init_all_map_bar(self, song_list):
         for index, song in enumerate(song_list):
-            self.__append_list(index=index, song=song)
+            Thread(target=self.__append_list, kwargs={"index": index, "song": song}, daemon=True).start()
+        self.__sort_list()
 
     def set_map_info_and_image(self):
         current_image = self.__list_manager.map_bar_list[self.__index_manager.current_index].image
@@ -142,6 +144,10 @@ class MapNavInitializer:
             MapBar(song_name=song, play_rank="A", display=self.__display, pos=self.__pos,
                    state=self.__state, index=index, index_manager=self.__index_manager,
                    hover_manager=self.__hover_manager))
+
+    def __sort_list(self):
+        # Threading messes up the index of the list, so I sort
+        self.__list_manager.map_bar_list.sort(key=lambda map_bar: map_bar.index)
 
     def __set_index(self, len_of_song_list):
         if self.__index_manager.current_index is None:

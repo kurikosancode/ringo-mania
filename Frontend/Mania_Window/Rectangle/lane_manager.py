@@ -6,7 +6,7 @@ from Frontend.Settings import IMPORT_MAP
 
 class LaneManager:
     __NUM_OF_LANES = 4
-    __IMPORT_INTERVAL = 48
+    __IMPORT_INTERVAL = 48.5
     __MULTIPLE_CIRCLE_CHANCE = {
         "Slider": 2,
         "2": 2,
@@ -65,7 +65,7 @@ class LaneManager:
         if self.__finished_importing:
             return
         self.__map_manager.import_map()
-        for _ in range(6):
+        for _ in range(10):
             next(self.__map_manager.imported_map)
         self.__set_up_timer_interval(ms_interval=self.__IMPORT_INTERVAL)
         self.__finished_importing = True

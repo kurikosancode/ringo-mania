@@ -1,5 +1,6 @@
 from pygame import mixer
 from pygame import time
+from threading import Thread
 from Frontend.Settings import SONG_VOLUME, HIT_SOUND_VOLUME, MISS_SOUND_VOLUME, SONG_FADE
 from Backend.Timer import IntervalTimer, TargetTimer
 from Backend.Map_Info.Map_Songs.songs_checker import SongChecker
@@ -7,13 +8,13 @@ import os
 
 
 class Music:
-    __ALL_MUSIC_DICT = {}
     __SOUND_INTERVAL = 90
     __SONG_FADE_MS = 100
     __ON_HIT_SOUNDS = True
     __SECOND_DELAY_BEFORE_REPEATING = -2
 
     def __init__(self, map_info=None):
+        self.__all_music_dict = {}
         self.__music = None
         self.__song_volume = SONG_VOLUME
         self.__starting_ms = time.get_ticks()
@@ -29,11 +30,14 @@ class Music:
         mixer.init()
 
     def __init_all_songs(self):
+        def init_song(song_name):
+            self.__all_music_dict[song_name] = mixer.Sound(os.path.join("Backend\Songs", f"{song_name}.mp3"))
+
         for song in self.__song_checker.get_all_songs():
-            self.__ALL_MUSIC_DICT[song] = mixer.Sound(os.path.join("Backend\Songs", f"{song}.mp3"))
+            Thread(target=init_song, kwargs={"song_name": song}, daemon=True).start()
 
     def set_music(self, song_name):
-        self.__music = self.__ALL_MUSIC_DICT[song_name]
+        self.__music = self.__all_music_dict[song_name]
 
     def play_music(self):
         if self.__map_info is not None:

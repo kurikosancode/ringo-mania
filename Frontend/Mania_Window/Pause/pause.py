@@ -17,7 +17,7 @@ class Pause:
         self.__opacity = Opacity()
         self.__pos = PausePos()
         self.__pause_timer = pause_timer
-        self.__interval_timer = interval_timer
+        self.__interval_timer_for_fall_circles = interval_timer
         self.__stopwatch = StopwatchTimer()
         self.__state = state
         self.__pause_surface = Surface((WIDTH, HEIGHT), SRCALPHA)
@@ -81,7 +81,7 @@ class Pause:
 
     def unpause(self) -> None:
         self.__music.unpause_music()
-        self.__interval_timer.add_to_last_time(add_time=self.__stopwatch.get_time_spent())
+        self.__interval_timer_for_fall_circles.add_to_last_time(add_time=self.__stopwatch.get_time_spent())
         self.__paused = False
         mouse.set_visible(False)
 

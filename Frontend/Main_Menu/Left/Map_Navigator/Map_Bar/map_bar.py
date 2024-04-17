@@ -113,6 +113,10 @@ class MapBar:
         return self.__profile.image
 
     @property
+    def index(self):
+        return self.__index
+
+    @property
     def change_top_index(self):
         """This is what to change when top bar not showing"""
         return self.__pos.record_y > 30
