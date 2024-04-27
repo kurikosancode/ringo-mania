@@ -14,7 +14,7 @@ from Backend.Timer import IntervalTimer
 class ManiaPlayWindow(GameModeWindow):
     __setup_finished = False
 
-    def __init__(self, music: Music, timer, play_tracker, map_info, display, window_manager):
+    def __init__(self, music: Music, timer, play_tracker, map_info, display, window_manager, background):
         super().__init__(display=display, font=Font(), music=music, play_tracker=play_tracker, timer=timer,
                          play_state=PlayState())
         self.record = Record(font=self.font, display=self.display)
@@ -25,7 +25,8 @@ class ManiaPlayWindow(GameModeWindow):
         self.map_status = MapStatus(imported=IMPORT_MAP)
         self.pause = Pause(music=self.music, font=self.font, state=self.state,
                            pause_timer=self.timer.pause_timer, interval_timer=self.__interval_timer)
-        self.end_screen = EndScreen(window_size=self.display.get_window_size, state=self.state, map_info=map_info)
+        self.end_screen = EndScreen(window_size=self.display.get_window_size, state=self.state, map_info=map_info,
+                                    background=background)
         self.rectangle = Rectangle(maps=self.map_manager,
                                    display=self.display, combo_counter=self.combo_counter, map_status=self.map_status,
                                    show_acc=self.show_acc, interval_timer=self.__interval_timer)

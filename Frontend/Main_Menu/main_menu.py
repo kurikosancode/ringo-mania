@@ -3,7 +3,7 @@ from Frontend.Helper_Files import WindowInterface, State
 from Frontend.Helper_Files.Interfaces import WindowEventHandler
 from Frontend.Score_Screen import ScoreScreen
 from Frontend.Settings import Color
-from .Helper_Files import MainMenuPos, EventHandlerNotifier, Background, SFXManager
+from .Helper_Files import MainMenuPos, EventHandlerNotifier, SFXManager
 from .Top import Top
 from .Bottom import Bottom
 from .Right import Right
@@ -15,7 +15,8 @@ class MainMenu(WindowInterface):
     __FONT_COLOR = Color.WHITE
     __COLOR = Color.DARK_PURPLE
 
-    def __init__(self, display, window_manager, map_info, play_tracker, player_tracker, music, profile_image_manager):
+    def __init__(self, display, window_manager, map_info, play_tracker, player_tracker, music, profile_image_manager,
+                 background):
         self.__display = display
         self.__pos = MainMenuPos(display=display)
         self.__music = music
@@ -35,9 +36,9 @@ class MainMenu(WindowInterface):
         self.__left_div = Left(display=self.__display, map_info=self.__map_info, state=self.__event_handler.state,
                                search_tracker=self.__search_tracker, notifier=self.__notifier,
                                sfx_manager=self.__sfx_manager)
-        self.__background = Background()
+        self.__background = background
         self.__score_screen = ScoreScreen(window_size=self.__display.get_window_size, state=self.__event_handler.state,
-                                          map_info=map_info)
+                                          map_info=map_info, background=background)
 
     def run(self):
         self.__setup()
@@ -60,8 +61,10 @@ class MainMenu(WindowInterface):
         self.__top_div.show(main_menu_surface=self.__main_menu_surface)
         self.__bottom_div.show(main_menu_surface=self.__main_menu_surface)
         self.__background.show_background(window=self.__display.window,
-                                          image=self.__map_info.current_background_image)
-        self.__right_div.show(main_menu_surface=self.__main_menu_surface, background_img=self.__background.background)
+                                          image=self.__map_info.current_background_image,
+                                          window_size=self.__display.get_window_size)
+        self.__right_div.show(main_menu_surface=self.__main_menu_surface, background_img=self.__background.background,
+                              background_position=self.__background.current_position)
 
     def __clear_surface(self):
         self.__main_menu_surface.fill((0, 0, 0, 0))

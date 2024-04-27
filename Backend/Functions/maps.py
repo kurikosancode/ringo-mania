@@ -26,7 +26,7 @@ class MapManager:
     def import_map(self):
         imported_map_list = []
         if not path.exists(self.__path):
-            raise Exception("File Not Found")
+            raise Exception("Rin file not found!")
         with open(self.__path, "r") as map_file:
             for lines in map_file:
                 imported_map_list.append(eval(lines.strip()))

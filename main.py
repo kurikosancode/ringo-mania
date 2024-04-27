@@ -4,6 +4,7 @@ from Backend.Timer import TargetTimer
 from Frontend.Main_Menu import MainMenu
 from Frontend.Mania_Window import ManiaPlayWindow
 from Frontend.Helper_Files import Display, WindowManager
+from Frontend.Helper_Files.Background import Background
 from Frontend.Settings import Color, FPS
 
 
@@ -17,14 +18,16 @@ class Main:
         self.__map_info = MapInfo()
         self.__music = Music(map_info=self.__map_info)
         self.__play_tracker = PlayTracker(map_info=self.__map_info)
+        self.__background = Background()
         self.__window_manager = WindowManager(display=self.__display)
         self.__main_menu = MainMenu(display=self.__display, window_manager=self.__window_manager,
                                     map_info=self.__map_info, play_tracker=self.__play_tracker, music=self.__music,
-                                    profile_image_manager=ProfileImageManager(), player_tracker=PlayerTracker())
+                                    profile_image_manager=ProfileImageManager(), player_tracker=PlayerTracker(),
+                                    background=self.__background)
         self.__play_window = ManiaPlayWindow(music=self.__music, timer=self.__timer,
                                              play_tracker=self.__play_tracker,
                                              map_info=self.__map_info, display=self.__display,
-                                             window_manager=self.__window_manager)
+                                             window_manager=self.__window_manager, background=self.__background)
         self.__window_manager.add_window(main_menu=self.__main_menu, play_window=self.__play_window)
 
     def run(self):

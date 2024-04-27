@@ -3,7 +3,6 @@ from Backend.Timer import DelayTimer
 from .left_side import LeftScoreScreen
 from .right_side import RightScoreScreen
 from Frontend.Helper_Files import FadeEffect, Opacity, State
-from .background import Background
 from Frontend.Settings import Color
 
 
@@ -13,7 +12,7 @@ class ScoreScreen:
     __BOTTOM_RECT_COLOR = Color.DARK_PURPLE
     __fade_out = True
 
-    def __init__(self, window_size: tuple[int, int], state: State, map_info):
+    def __init__(self, window_size: tuple[int, int], state: State, map_info, background):
         width, height = window_size
         self.pos = EndScreenPos(width=width, height=height)
         self.state: State = state
@@ -25,7 +24,7 @@ class ScoreScreen:
         self.__map_info = map_info
         self.__right_screen = RightScoreScreen(screen=self.score_screen, pos=self.pos,
                                                state=self.state, map_info=self.__map_info)
-        self.__background = Background()
+        self.__background = background
         self.delay_timer = DelayTimer()
 
     def show_score_screen(self, window: SurfaceType | Surface, size: tuple[int, int], stats: dict, date_time: dict,
@@ -79,8 +78,9 @@ class ScoreScreen:
         r, g, b = self.__BACKGROUND_COLOR
         draw.rect(self.score_screen, (r, g, b, self.__opacity.opacity), (0, 0, self.pos.width, self.pos.height))
         if self.__SHOW_BACKGROUND:
-            self.__background.show_background(screen=self.score_screen,
-                                              background_image=self.__map_info.current_background_image)
+            self.__background.show_background_score_screen(window=self.score_screen,
+                                                           image=self.__map_info.current_background_image,
+                                                           window_size=self.pos.window_size)
 
     def __score_screen_setup(self, size: tuple[int, int]):
         width, height = size

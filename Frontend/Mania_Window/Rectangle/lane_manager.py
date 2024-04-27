@@ -18,7 +18,7 @@ class LaneManager:
     def __init__(self, window, display, rectangle_pos, map_manager, interval_timer):
         self.lane_circle_manager = LaneCircleManager(display=display, rectangle_pos=rectangle_pos)
         self.lanes_taken = []
-        self.__circle_image_manager = CircleImage()
+        self.__circle_image_manager = CircleImage(size=self.lane_circle_manager.circle_size)
         lane_coord = self.lane_circle_manager.circle_position
         self.lanes: [Lane] = [Lane(x=lane_coord[0], circle_image_manager=self.__circle_image_manager),
                               Lane(x=lane_coord[1], circle_image_manager=self.__circle_image_manager),
@@ -127,7 +127,7 @@ class LaneManager:
 
     def update_circles(self):
         for index, lane in enumerate(self.lanes):
-            lane.update_circles(self.lane_circle_manager.circle_size,
+            lane.update_circles(size=self.lane_circle_manager.circle_size,
                                 circle_x=self.lane_circle_manager.circle_position[index])
 
     @staticmethod

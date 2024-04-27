@@ -71,8 +71,11 @@ class MapInfo:
 
 
 class ImageManager:
-    __current_background_image = None
-    __low_opacity_background_image = None
+    __PADDING_RATIO = 20
+
+    def __init__(self):
+        self.__current_background_image = None
+        self.__low_opacity_background_image = None
 
     @property
     def low_opacity_background_image(self):
@@ -83,6 +86,10 @@ class ImageManager:
         return self.__current_background_image
 
     def set_background(self, image, window_size):
-        self.__current_background_image = transform.scale(image, window_size)
+        self.__current_background_image = transform.scale(image, self.__padding_of_image(window_size=window_size))
         self.__low_opacity_background_image = copy(self.__current_background_image)
         self.__low_opacity_background_image.set_alpha(15)
+
+    def __padding_of_image(self, window_size: tuple):
+        width, height = window_size
+        return width + width // self.__PADDING_RATIO, height + height // self.__PADDING_RATIO

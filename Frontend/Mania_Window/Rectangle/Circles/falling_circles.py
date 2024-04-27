@@ -7,7 +7,7 @@ class FallingCircle(Circle):
     __out = False
 
     def __init__(self, window, lane_x, circle_image_manager, circle_size=DEFAULT_CIRCLE_SIZE):
-        super().__init__(circle_image_manager=circle_image_manager, circle_size=circle_size)
+        super().__init__(circle_image_manager=circle_image_manager)
         self.__y = -100
         self.__hit_box = Rect(lane_x, self.__y, circle_size, circle_size)
         self.__window = window

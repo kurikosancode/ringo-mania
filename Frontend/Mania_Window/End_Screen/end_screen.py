@@ -9,8 +9,8 @@ from .restart_button import RestartButton
 class EndScreen(ScoreScreen):
     __SHOW_BACKGROUND = True
 
-    def __init__(self, window_size: tuple[int, int], state, map_info):
-        super().__init__(window_size=window_size, state=state, map_info=map_info)
+    def __init__(self, window_size: tuple[int, int], state, map_info, background):
+        super().__init__(window_size=window_size, state=state, map_info=map_info, background=background)
         self.__restart_button = RestartButton(event_handler=ButtonEventHandler(), end_screen=self.score_screen,
                                               pos=self.pos, state=state)
 

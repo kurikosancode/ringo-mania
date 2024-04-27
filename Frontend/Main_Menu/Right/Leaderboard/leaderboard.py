@@ -6,13 +6,13 @@ from Frontend.Helper_Files import ButtonEventHandler
 
 class Leaderboard:
     __initialized = False
-    __map_records_dict = {}
 
     def __init__(self, play_tracker, display, state, notifier, sfx_manager, profile_image_manager):
         self.__play_tracker = play_tracker
         self.__display = display
         self.__pos = Pos(display=display)
         self.__record_list: list[Record] = []
+        self.__map_records_dict = {}
         self.__state = state
         self.__view_counter = ViewCounter()
         self.__best_play: Record
@@ -23,13 +23,14 @@ class Leaderboard:
         self.__leaderboard_image_manager = LeaderboardImageManager(profile_image_manager=profile_image_manager,
                                                                    display=display)
 
-    def show_leaderboard(self, main_menu_surface, background_img):
+    def show_leaderboard(self, main_menu_surface, background_img, background_position):
         self.__init_leaderboard()
         self.__leaderboard_image_manager.check_if_resize()
-        self.__show_all_records(main_menu_surface=main_menu_surface, background_img=background_img)
+        self.__show_all_records(main_menu_surface=main_menu_surface, background_img=background_img,
+                                background_position=background_position)
         self.__event_handler.check_for_events()
 
-    def __show_all_records(self, main_menu_surface, background_img):
+    def __show_all_records(self, main_menu_surface, background_img, background_position):
         self.__view_counter.reset_view()
         for index, record in enumerate(self.__record_list):
             record.show(main_menu_surface=main_menu_surface, y=self.__pos.starting_record_pos(index=index))
@@ -37,7 +38,8 @@ class Leaderboard:
         if len(self.__record_list) >= self.__view_counter.MAX_RECORD_VIEW:
             self.__best_play.show_static(main_menu_surface=main_menu_surface, y=690)
             self.__event_handler.check_if_click_best_record(record=self.__best_play)
-            self.__hidden_background.show(background_img=background_img, surface=main_menu_surface)
+            self.__hidden_background.show(background_img=background_img, surface=main_menu_surface,
+                                          background_position=background_position)
 
     def __init_leaderboard(self):
         if self.__initialized:
@@ -96,17 +98,18 @@ class HiddenBackground:
         self.__img_surface_bottom = Surface((700, 55))
         self.__img_surface_top = Surface((700, 55))
 
-    def show(self, background_img, surface):
-        self.__blit_image(image=background_img)
+    def show(self, background_img, surface, background_position):
+        self.__blit_image(image=background_img, background_position=background_position)
         self.__blit_to_surface(surface=surface)
 
     def __blit_to_surface(self, surface):
         surface.blit(self.__img_surface_top, (1000, 165))
         surface.blit(self.__img_surface_bottom, (1000, 635))
 
-    def __blit_image(self, image):
-        self.__img_surface_top.blit(image, (-1000, -165))
-        self.__img_surface_bottom.blit(image, (-1000, -635))
+    def __blit_image(self, image, background_position):
+        background_x, background_y = background_position
+        self.__img_surface_top.blit(image, (background_x - 1000, background_y - 165))
+        self.__img_surface_bottom.blit(image, (background_x - 1000, background_y - 635))
 
 
 class LeaderboardEventHandler:

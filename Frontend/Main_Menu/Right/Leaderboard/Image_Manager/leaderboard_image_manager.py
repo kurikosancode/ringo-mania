@@ -1,4 +1,5 @@
 from pygame import transform
+from threading import Thread
 
 
 class LeaderboardImageManager:
@@ -7,8 +8,8 @@ class LeaderboardImageManager:
 
     def __init__(self, profile_image_manager, display):
         self.__profile_image_manager = profile_image_manager
-        self.__init_record_images()
         self.__size_manager = SizeManager(display=display)
+        Thread(target=self.__init_record_images, daemon=True).start()
 
     def __init_record_images(self):
         self.__original_sized_record_profiles = self.__profile_image_manager.copy_player_images()

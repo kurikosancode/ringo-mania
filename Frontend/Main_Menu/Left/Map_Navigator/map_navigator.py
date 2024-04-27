@@ -1,4 +1,5 @@
 from random import shuffle
+from time import sleep
 from threading import Thread
 from Backend.Map_Info.Map_Songs.songs_checker import SongChecker
 from .Map_Bar import MapBar, MapIndexManager
@@ -131,6 +132,7 @@ class MapNavInitializer:
     def __init_all_map_bar(self, song_list):
         for index, song in enumerate(song_list):
             Thread(target=self.__append_list, kwargs={"index": index, "song": song}, daemon=True).start()
+        sleep(2)
         self.__sort_list()
 
     def set_map_info_and_image(self):
