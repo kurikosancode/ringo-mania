@@ -1,6 +1,7 @@
 from pygame import transform
 from copy import copy
-from Backend.Map_Info.Map_Info.map_info_checker import MapInfoChecker
+from .map_info_checker import MapInfoChecker
+from Frontend.Settings import BACKGROUND_PADDING
 
 
 class MapInfo:
@@ -71,7 +72,7 @@ class MapInfo:
 
 
 class ImageManager:
-    __PADDING_RATIO = 20
+    __PADDING_RATIO = BACKGROUND_PADDING
 
     def __init__(self):
         self.__current_background_image = None
