@@ -7,7 +7,7 @@ from Frontend.Settings import BACKGROUND_PADDING
 class MapInfo:
     changed = True
 
-    def __init__(self, song_name: str = None, song_artist: str = "IDK", map_maker: str = "Dudesalp"):
+    def __init__(self, song_name: str = None, song_artist: str = "Arnoco", map_maker: str = "Dudesalp"):
         self.__song_file_name = song_name
         self.__artist = song_artist
         self.__map_maker = map_maker

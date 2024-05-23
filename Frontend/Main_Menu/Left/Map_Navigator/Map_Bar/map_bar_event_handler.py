@@ -3,10 +3,10 @@ from Frontend.Helper_Files.button_event_handler import ButtonEventHandler
 
 
 class MapBarEventHandler:
-    __CLICK_INTERVAL = 80
+    __CLICK_INTERVAL = 200
 
     def __init__(self, pos, index_manager, index, state, hover_manager):
-        self.__timer = DelayTimer()
+        self.__delay_timer = DelayTimer()
         self.__pos = pos
         self.__button_handler = ButtonEventHandler()
         self.__index_manager = index_manager
@@ -15,19 +15,19 @@ class MapBarEventHandler:
         self.__state = state
 
     def check_if_clicked(self, chosen: bool):
+        self.__delay_timer.check_delay_ms(self.__CLICK_INTERVAL)
+        if not self.__delay_timer.timer_finished:
+            return False
         if chosen:
             return self.__check_if_clicked_chosen()
         else:
             return self.__check_if_clicked_not_chosen()
 
     def __check_if_clicked_not_chosen(self):
-        self.__timer.reset_timer()
+        self.__delay_timer.reset_timer()
         return self.__map_bar_click_checker(command=self.set_chosen)
 
     def __check_if_clicked_chosen(self):
-        self.__timer.check_delay_ms(self.__CLICK_INTERVAL)
-        if not self.__timer.timer_finished:
-            return False
         return self.__map_bar_click_checker(command=self.__state.show_play_window)
 
     def __map_bar_click_checker(self, command) -> bool:

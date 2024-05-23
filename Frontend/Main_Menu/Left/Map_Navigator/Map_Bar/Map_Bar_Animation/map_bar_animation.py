@@ -1,18 +1,19 @@
-from Frontend.Helper_Files.Animation import SmoothAnimation
+from Frontend.Helper_Files.Animation import SmoothAnimation, EaseOutSuperFastSmoothing
 from Frontend.Helper_Files.Transition.target_manager import TargetManager
 from .click_animation import ClickAnimation
 from .hover_animation import HoverAnimation
 
 
 class MapBarAnimation:
-    __SPEED_PER_FRAME = 0.1
+    __SPEED_PER_FRAME = 0.03
 
     def __init__(self, is_chosen: bool, map_bar_pos):
         self.__chosen = is_chosen
         self.__map_bar_pos = map_bar_pos
         self.__target_manager = TargetManager()
         self.__animation_manager = SmoothAnimation(target_manager=self.__target_manager,
-                                                   speed_per_frame=self.__SPEED_PER_FRAME)
+                                                   speed_per_frame=self.__SPEED_PER_FRAME,
+                                                   smoothing_method=EaseOutSuperFastSmoothing())
         self.__start_manager = AnimationStartManager()
         self.__hover_animation = HoverAnimation(map_bar_pos=map_bar_pos, smooth_animation=self.__animation_manager,
                                                 start_manager=self.__start_manager,

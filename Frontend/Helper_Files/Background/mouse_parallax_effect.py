@@ -26,11 +26,14 @@ class MouseParallaxEffect:
         self.__smoothing.check_if_mouse_parallax(moved_cursor=moved_cursor)
         if not moved_cursor:
             return
-        self.__background_pos.x = self.__map_value(mouse_coord=mouse_x, window_size=window_x)
-        self.__background_pos.y = self.__map_value(mouse_coord=mouse_y, window_size=window_y)
-
-    def __map_value(self, mouse_coord, window_size):
-        # Smoothing doesn't work
         smoothing_percentage = self.__smoothing.get_current_percentage if self.__SMOOTHING else 1
+        self.__background_pos.x = self.__map_value(mouse_coord=mouse_x, window_size=window_x,
+                                                   smoothing_percentage=smoothing_percentage)
+        self.__background_pos.y = self.__map_value(mouse_coord=mouse_y, window_size=window_y,
+                                                   smoothing_percentage=smoothing_percentage)
+
+    def __map_value(self, mouse_coord, window_size, smoothing_percentage):
+        """The smoothing doesn't work because it's based on the mouse position, not on length of mouse movement.
+           If I want this to work, I need to modify the speed."""
         padding = (window_size // self.__PADDING_RATIO) // 2
         return (-((mouse_coord / window_size) * padding) - padding) * smoothing_percentage
