@@ -44,11 +44,11 @@ class MapNavigator:
     def show(self, main_menu_surface):
         self.__initializer.init_leaderboard()
         self.__check_if_change_index()
+        self.__event_handler.check_for_events(current_index=self.__index_manager.current_index)
         self.__animation_manager.check_for_animation()
         self.__show_all_map_bar(main_menu_surface=main_menu_surface)
         self.__search_bar.show(surface=main_menu_surface, selected_map_bar_pos=self.__list_manager.map_bar_list[
             self.__index_manager.current_index].position, map_bar_size=self.__pos.chosen_size)
-        self.__event_handler.check_for_events(current_index=self.__index_manager.current_index)
         self.__check_if_set_map_info_and_image()
 
     def __check_if_change_index(self):
@@ -112,7 +112,7 @@ class MapNavInitializer:
         self.__song_checker = song_checker
         self.__list_manager = list_manager
         self.__display = display
-        self.__index_manager = index_manager
+        self.__index_manager: MapIndexManager = index_manager
         self.__view_counter = view_counter
         self.__pos = pos
         self.__state = state
@@ -124,8 +124,8 @@ class MapNavInitializer:
         if not (song_list := self.__song_checker.get_all_songs()):
             return
         shuffle(song_list)
-        self.__init_all_map_bar(song_list=song_list)
         self.__set_index(len_of_song_list=len(song_list))
+        self.__init_all_map_bar(song_list=song_list)
         self.set_map_info_and_image()
         self.__pos.set_y(index=self.__view_counter.current_top_view)
 
@@ -153,8 +153,8 @@ class MapNavInitializer:
 
     def __set_index(self, len_of_song_list):
         if self.__index_manager.current_index is None:
-            middle_chosen_index = len_of_song_list // 2 + 2
-            self.__list_manager.map_bar_list[middle_chosen_index].set_chosen()
+            chosen_index = len_of_song_list // 2 + 2
+            self.__index_manager.set_index(chosen_index)
 
     def reset_init(self):
         self.__initialized = False

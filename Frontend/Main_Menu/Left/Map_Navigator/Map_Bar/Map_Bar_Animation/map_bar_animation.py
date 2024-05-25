@@ -7,8 +7,7 @@ from .hover_animation import HoverAnimation
 class MapBarAnimation:
     __SPEED_PER_FRAME = 0.03
 
-    def __init__(self, is_chosen: bool, map_bar_pos):
-        self.__chosen = is_chosen
+    def __init__(self, map_bar_pos):
         self.__map_bar_pos = map_bar_pos
         self.__target_manager = TargetManager()
         self.__animation_manager = SmoothAnimation(target_manager=self.__target_manager,
@@ -27,11 +26,11 @@ class MapBarAnimation:
             self.__animate_map_bar()
 
     def __correct_conditions(self, is_chosen, is_hovered):
-        if not (self.__hover_animation.check_if_animate(is_chosen=is_chosen, is_hovered=is_hovered) or
-                self.__click_animation.check_if_animate(is_chosen=is_chosen)):
-            return False
         if self.__animation_manager.finished_animation:
             self.__start_manager.start_animation = False
+        self.__hover_animation.check_if_init_animate(is_chosen=is_chosen, is_hovered=is_hovered)
+        self.__click_animation.check_if_init_animate(is_chosen=is_chosen)
+        if not self.__start_manager.start_animation:
             return False
         return True
 

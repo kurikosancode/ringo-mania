@@ -230,3 +230,45 @@ class ActivationTimer:
 
     def change_interval(self, interval):
         self.__interval = interval
+
+
+class CooldownTimer:
+    def __init__(self, cooldown: int = 100):
+        self.__last_time_taken: int = time.get_ticks()
+        self.__cooldown = cooldown
+        self.__finished_cooldown = False
+
+    def check_if_cooldown_finished(self) -> bool:
+        """
+        Checks if the cooldown period has finished.
+
+        :return: True if the cooldown period has finished, otherwise False.
+        """
+
+        if not self.__finished_cooldown:
+            self.__finished_cooldown = self.__check_if_finished_cooldown()
+        return self.__finished_cooldown
+
+    def __check_if_finished_cooldown(self) -> bool:
+        current_time = self.__get_current_time
+        if current_time >= self.__last_time_taken + self.__cooldown:
+            self.__last_time_taken = current_time
+            return True
+        return False
+
+    def reset_cooldown(self):
+        self.__last_time_taken = self.__get_current_time
+        self.__finished_cooldown = False
+
+    @property
+    def __get_current_time(self):
+        return time.get_ticks()
+
+    def debug(self):
+        print("Debugging: ")
+        print(f"current time: {time.get_ticks()}")
+        print(f"last time: {self.__last_time_taken}")
+        print(f"finished cooldown: {self.__finished_cooldown}")
+
+    def change_cooldown(self, cooldown):
+        self.__cooldown = cooldown

@@ -24,14 +24,14 @@ class MapBar:
         self.__state = state
         self.__text = MapBarText(map_info=self.__map_bar_info, pos=self.__pos)
         self.__index_manager = index_manager
-        self.__map_bar_animation = MapBarAnimation(is_chosen=self.is_chosen, map_bar_pos=self.__pos)
+        self.__map_bar_animation = MapBarAnimation(map_bar_pos=self.__pos)
         self.__event_handler = MapBarEventHandler(index=self.__index, index_manager=index_manager, pos=self.__pos,
                                                   state=state, hover_manager=hover_manager)
 
     def show(self, main_menu_surface):
-        self.update_rect()
         self.__map_bar_animation.check_for_animation(is_chosen=self.is_chosen,
                                                      is_hovered=self.check_if_hovered())
+        self.update_rect()
         if self.is_chosen:
             self.__show_chosen(main_menu_surface=main_menu_surface)
         else:

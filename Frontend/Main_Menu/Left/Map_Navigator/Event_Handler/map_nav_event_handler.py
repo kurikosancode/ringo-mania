@@ -1,18 +1,18 @@
 from pygame import key, K_RETURN, K_UP, K_DOWN, K_BACKSPACE
-from Backend.Timer import IntervalTimer, ActivationTimer
+from Backend.Timer import CooldownTimer, ActivationTimer
 from Frontend.Helper_Files import ButtonEventHandler
 
 
 class MapNavigatorEventHandler:
-    __CLICK_INTERVAL = 80
+    __CLICK_COOLDOWN = 200
 
     def __init__(self, list_manager, pos, notifier, sfx_manager, hover_manager, scroll_manager, search_tracker):
-        self.__interval_timer: IntervalTimer = IntervalTimer(interval=self.__CLICK_INTERVAL)
+        self.__cooldown_timer = CooldownTimer(cooldown=self.__CLICK_COOLDOWN)
         self.__filtered_event_handler = FilteredEventHandler(list_manager=list_manager)
         self.__unfiltered_event_handler = UnfilteredEventHandler(list_manager=list_manager)
         self.__mouse_event_handler = MouseEventHandler(button_event_handler=ButtonEventHandler(),
                                                        scroll_manager=scroll_manager,
-                                                       interval_timer=self.__interval_timer, pos=pos,
+                                                       cooldown_timer=self.__cooldown_timer, pos=pos,
                                                        list_manager=list_manager,
                                                        filtered_event_handler=self.__filtered_event_handler,
                                                        unfiltered_event_handler=self.__unfiltered_event_handler,
@@ -28,12 +28,12 @@ class MapNavigatorEventHandler:
 
 
 class MouseEventHandler:
-    def __init__(self, button_event_handler, pos, interval_timer, list_manager, filtered_event_handler,
+    def __init__(self, button_event_handler, pos, cooldown_timer, list_manager, filtered_event_handler,
                  unfiltered_event_handler, notifier, sfx_manager, hover_manager, scroll_manager):
         self.__button_event_handler = button_event_handler
         self.__scroll_manager = scroll_manager
         self.__pos = pos
-        self.__interval_timer = interval_timer
+        self.__cooldown_timer: CooldownTimer = cooldown_timer
         self.__list_manager = list_manager
         self.__filtered_event_handler: FilteredEventHandler = filtered_event_handler
         self.__unfiltered_event_handler: UnfilteredEventHandler = unfiltered_event_handler
@@ -71,14 +71,17 @@ class MouseEventHandler:
         return False
 
     def __check_if_clicked_record(self):
-        if not self.__interval_timer.time_interval_finished():
+        if not self.__cooldown_timer.check_if_cooldown_finished():
             return
-        elif self.__list_manager.using_filter:
-            if self.__filtered_event_handler.check_if_clicked_filtered_record():
-                self.__sfx_manager.play_menu_hit()
+        if self.__list_manager.using_filter:
+            if not self.__filtered_event_handler.check_if_clicked_filtered_record():
+                return
+            self.__sfx_manager.play_menu_hit()
         else:
-            if self.__unfiltered_event_handler.check_if_clicked_unfiltered_record():
-                self.__sfx_manager.play_menu_hit()
+            if not self.__unfiltered_event_handler.check_if_clicked_unfiltered_record():
+                return
+            self.__sfx_manager.play_menu_hit()
+        self.__cooldown_timer.reset_cooldown()
 
     def __check_if_play_hover_sfx(self):
         if self.__hover_manager.changed_hover:
@@ -155,14 +158,12 @@ class FilteredEventHandler:
         self.__list_manager = list_manager
 
     def check_if_clicked_filtered_record(self):
-        map_bar_clicked = False
         for map_bar in self.__list_manager.filtered_map_bar_list:
             if not map_bar.is_viewed:
                 continue
-            current_map_bar_clicked = map_bar.check_if_clicked()
-            if not map_bar_clicked:
-                map_bar_clicked = current_map_bar_clicked
-        return map_bar_clicked
+            if map_bar.check_if_clicked():
+                return True
+        return False
 
 
 class UnfilteredEventHandler:
@@ -170,11 +171,9 @@ class UnfilteredEventHandler:
         self.__list_manager = list_manager
 
     def check_if_clicked_unfiltered_record(self):
-        map_bar_clicked = False
         for map_bar in self.__list_manager.map_bar_list:
             if not map_bar.is_viewed:
                 continue
-            current_map_bar_clicked = map_bar.check_if_clicked()
-            if not map_bar_clicked:
-                map_bar_clicked = current_map_bar_clicked
-        return map_bar_clicked
+            if map_bar.check_if_clicked():
+                return True
+        return False

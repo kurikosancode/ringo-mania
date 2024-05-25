@@ -7,12 +7,9 @@ class HoverAnimation:
         self.__animation_manager = smooth_animation
         self.__start_manager = start_manager
 
-    def check_if_animate(self, is_chosen, is_hovered):
+    def check_if_init_animate(self, is_chosen, is_hovered):
         if not self.__hovered == is_hovered:
             self.__setup_animation(is_chosen=is_chosen, is_hovered=is_hovered)
-        if self.__start_manager.start_animation:
-            return True
-        return False
 
     def __setup_animation(self, is_hovered, is_chosen):
         self.__animation_manager.reset()
