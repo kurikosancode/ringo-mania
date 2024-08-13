@@ -7,6 +7,7 @@ from Frontend.Mania_Window.Stats import ComboCounter, ShowAcc, Stats, Record
 from Frontend.Mania_Window.Pause import Pause
 from Frontend.Mania_Window.End_Screen import EndScreen
 from Frontend.Helper_Files.Interfaces import State, WindowEventHandler
+from Frontend.Helper_Files import DeltaTimeManager
 from Backend import Music, MapManager
 from Backend.Timer import IntervalTimer
 
@@ -14,65 +15,68 @@ from Backend.Timer import IntervalTimer
 class ManiaPlayWindow(GameModeWindow):
     __setup_finished = False
 
-    def __init__(self, music: Music, timer, play_tracker, map_info, display, window_manager, background):
+    def __init__(self, music: Music, timer, play_tracker, map_info, display, window_manager, background,
+                 delta_time_manager: DeltaTimeManager):
         super().__init__(display=display, font=Font(), music=music, play_tracker=play_tracker, timer=timer,
-                         play_state=PlayState())
-        self.record = Record(font=self.font, display=self.display)
+                         play_state=PlayState(), delta_time_manager=delta_time_manager)
+        self.record = Record(font=self._font, display=self._display)
         self.map_manager = MapManager(map_info=map_info)
-        self.combo_counter = ComboCounter(font=self.font)
+        self.combo_counter = ComboCounter(font=self._font)
         self.show_acc = ShowAcc()
         self.__interval_timer = IntervalTimer()
         self.map_status = MapStatus(imported=IMPORT_MAP)
-        self.pause = Pause(music=self.music, font=self.font, state=self.state,
-                           pause_timer=self.timer.pause_timer, interval_timer=self.__interval_timer)
-        self.end_screen = EndScreen(window_size=self.display.get_window_size, state=self.state, map_info=map_info,
+        self.pause = Pause(music=self._music, font=self._font, state=self._state,
+                           pause_timer=self._timer.pause_timer, interval_timer=self.__interval_timer)
+        self.end_screen = EndScreen(window_size=self._display.get_window_size, state=self._state, map_info=map_info,
                                     background=background)
         self.rectangle = Rectangle(maps=self.map_manager,
-                                   display=self.display, combo_counter=self.combo_counter, map_status=self.map_status,
-                                   show_acc=self.show_acc, interval_timer=self.__interval_timer)
-        self.stats = Stats(display=self.display, rectangle_pos=self.rectangle.pos_class)
+                                   display=self._display, combo_counter=self.combo_counter, map_status=self.map_status,
+                                   show_acc=self.show_acc, interval_timer=self.__interval_timer,
+                                   delta_time_manager=delta_time_manager)
+        self.stats = Stats(display=self._display, rectangle_pos=self.rectangle.pos_class)
         self.event_handler = ManiaEventHandler(play_window=self, window_manager=window_manager,
                                                map_manager=self.map_manager, display=display,
                                                end_screen=self.end_screen, timer=timer, music=music,
-                                               play_tracker=play_tracker, map_status=self.map_status)
+                                               play_tracker=play_tracker, map_status=self.map_status, font=self._font,
+                                               state=self._state)
 
     def run(self):
         self.background_setup()
-        self.timer.compute_if_finish_timer()
-        self.rectangle.run(current_time=self.timer.current_time, pause=self.pause.is_paused)
+        self._timer.compute_if_finish_timer()
+        self.rectangle.run(current_time=self._timer.current_time, pause=self.pause.is_paused)
         self.show_stats_and_etc()
         self.event_handler.check_events()
 
     def restart(self):
         self.combo_counter.reset_all()
         self.show_acc.reset_acc()
-        self.music.restart_music()
-        self.timer.restart()
+        self._music.restart_music()
+        self._timer.restart()
         self.map_status.restart()
         self.rectangle.restart()
         self.end_screen.restart()
-        self.record.init_record(self.play_tracker.check_plays())
-        self.play_tracker.restart()
-        self.state.reset_all()
+        self.record.init_record(self._play_tracker.check_plays())
+        self._play_tracker.restart()
+        self._state.reset_all()
         self.__setup_finished = False
 
     def show_stats_and_etc(self):
-        self.font.update_all_font(self.display.height)
+        self._font.update_all_font(self._display.height)
         self.stats.show_all(play_info=self.combo_counter.get_play_info_text, life=self.combo_counter.life)
         self.record.show_record(current_rec=self.combo_counter.info)
 
     def background_setup(self):
         if self.__setup_finished:
             return
-        music_length = self.music.play_music()
-        self.timer.set_target_time(music_length, END_SONG_DELAY)
-        self.record.init_record(self.play_tracker.check_plays())
-        self.display.show_cursor(show=False)
+        music_length = self._music.play_music()
+        self._timer.set_target_time(music_length, END_SONG_DELAY)
+        self.record.init_record(self._play_tracker.check_plays())
+        self._display.show_cursor(show=False)
         self.__setup_finished = True
 
     def show_end_screen(self):
-        self.end_screen.show_end_screen(window=self.display.window, stats=self.combo_counter.get_stats,
-                                        size=self.display.get_window_size, date_time=self.combo_counter.date_time,
+        self.end_screen.show_end_screen(window=self._display.window, stats=self.combo_counter.get_stats,
+                                        size=self._display.get_window_size, date_time=self.combo_counter.date_time,
                                         grade=self.combo_counter.get_grade)
 
 
@@ -102,8 +106,7 @@ class PlayState(State):
 
 class ManiaEventHandler(WindowEventHandler):
     def __init__(self, play_window: ManiaPlayWindow, display, timer, end_screen, window_manager, music, map_status,
-                 map_manager,
-                 play_tracker):
+                 map_manager, state, play_tracker, font):
         self.__play_window = play_window
         self.__window_manager = window_manager
         self.__map_manager = map_manager
@@ -113,6 +116,8 @@ class ManiaEventHandler(WindowEventHandler):
         self.__end_screen = end_screen
         self.__timer = timer
         self.__display = display
+        self.__state = state
+        self.__font = font
 
     def check_events(self):
         self.__detect_key()
@@ -132,17 +137,17 @@ class ManiaEventHandler(WindowEventHandler):
         for keys, index in KEY_BINDS.items():
             if key_pressed[eval(keys)]:
                 self.__play_window.rectangle.key_pressed(index=index)
-                self.__play_window.music.play_hit_sound()
+                self.__music.play_hit_sound()
 
     def __check_if_missed(self):
         if self.__play_window.combo_counter.miss_sfx:
-            self.__play_window.music.play_miss_sound()
+            self.__music.play_miss_sound()
             self.__play_window.combo_counter.miss_sfx = False
 
     def __check_map_if_failed(self):
         if self.__play_window.combo_counter.life <= 0:
-            self.__play_window.map_status.failed = True
-            self.__play_window.music.fade_music()
+            self.__map_status.failed = True
+            self.__music.fade_music()
             self.__play_window.show_end_screen()
 
     def check_window_if_quit(self):
@@ -151,7 +156,7 @@ class ManiaEventHandler(WindowEventHandler):
                 self.__window_manager.quit()
 
     def __check_if_leave_play_window(self):
-        if not self.__play_window.state.leave_mania:
+        if not self.__state.leave_mania:
             return
         self.__window_manager.show_main_menu()
 
@@ -174,10 +179,10 @@ class ManiaEventHandler(WindowEventHandler):
                 window=self.__display.window)
 
     def __check_window_if_restart(self):
-        if self.__play_window.state.restarted:
+        if self.__state.restarted:
             self.__play_window.restart()
 
     def __check_window_if_resized(self):
         if self.__display.check_window_size():
-            self.__play_window.font.update_all_font(self.__play_window.display.height)
+            self.__font.update_all_font(self.__display.height)
             self.__play_window.rectangle.update_rect()

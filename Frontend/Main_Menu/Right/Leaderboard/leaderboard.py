@@ -47,8 +47,7 @@ class Leaderboard:
         if not (play_list := self.__get_records_without_checking_dict()):
             return
         self.__best_play = play_list["best play"]
-        for record in play_list["all records"]:
-            self.__record_list.append(record)
+        self.__record_list.extend(play_list["all records"])
         self.__pos.reset_record_starting_y()
         self.__initialized = True
 

@@ -12,7 +12,7 @@ class PlayTracker:
 
     @property
     def path(self):
-        return path.join("Backend\Map_History", f"{self.map_info.song_name}.rinh")
+        return path.join("Backend\Map_History", f"{self.name}.rinh")
 
     @property
     def name(self):

@@ -29,12 +29,11 @@ class FallingCircle(Circle):
     def __check_out_of_screen(self, height):
         if self.__hit_box.y >= height:
             self.__out = True
-            del self
 
     @property
     def hit_box(self):
         return self.__hit_box
 
     @property
-    def out(self):
+    def out_of_bounds(self):
         return self.__out

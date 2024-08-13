@@ -2,6 +2,7 @@ from Frontend.Mania_Window.Rectangle.lane import Lane
 from .Circles import CircleImage
 from random import randrange, getrandbits
 from Frontend.Settings import IMPORT_MAP
+from Frontend.Helper_Files import DeltaTimeManager
 
 
 class LaneManager:
@@ -15,7 +16,8 @@ class LaneManager:
     }
     __finished_importing = False
 
-    def __init__(self, window, display, rectangle_pos, map_manager, interval_timer):
+    def __init__(self, window, display, rectangle_pos, map_manager, interval_timer,
+                 delta_time_manager: DeltaTimeManager):
         self.lane_circle_manager = LaneCircleManager(display=display, rectangle_pos=rectangle_pos)
         self.lanes_taken = []
         self.__circle_image_manager = CircleImage(size=self.lane_circle_manager.circle_size)
@@ -25,8 +27,8 @@ class LaneManager:
                               Lane(x=lane_coord[2], circle_image_manager=self.__circle_image_manager),
                               Lane(x=lane_coord[3], circle_image_manager=self.__circle_image_manager)]
         self.window = window
+        self.__delta_time_manager = delta_time_manager
         self.__interval_timer = interval_timer
-        self.__set_up_timer_interval()
         self.__map_manager = map_manager
 
     def __set_up_timer_interval(self, ms_interval=None):
@@ -38,6 +40,7 @@ class LaneManager:
         if IMPORT_MAP:
             self.__init_with_import()
         else:
+            self.__set_up_timer_interval()
             self.__init_without_import(current_time=current_time)
 
     def __init_without_import(self, current_time: int):
@@ -104,13 +107,15 @@ class LaneManager:
             self.multiple_circles_process(current_circle + 1)
 
     def show_all_circles(self, height, pause):
-        self.show_sliders_to_all_lanes(height=height, pause=pause)
+        # self.show_sliders_to_all_lanes(height=height, pause=pause)
         self.show_hitting_circles_to_all_lanes()
         self.show_fall_circles_to_all_lanes(height=height, pause=pause)
 
     def show_fall_circles_to_all_lanes(self, height, pause: bool):
+        speed_per_frame = self.__delta_time_manager.get_value_per_frame(self.lane_circle_manager
+                                                                        .circle_speed_per_second)
         for lane in self.lanes:
-            lane.show_fall_circles(height=height, speed=self.lane_circle_manager.circle_speed, pause=pause)
+            lane.show_fall_circles(height=height, speed=speed_per_frame, pause=pause)
 
     def show_hitting_circles_to_all_lanes(self):
         for lane in self.lanes:
@@ -118,8 +123,10 @@ class LaneManager:
                                      size=self.lane_circle_manager.circle_size)
 
     def show_sliders_to_all_lanes(self, height, pause: bool):
+        speed_per_frame = self.__delta_time_manager.get_value_per_frame(self.lane_circle_manager
+                                                                        .circle_speed_per_second)
         for lane in self.lanes:
-            lane.show_sliders(height=height, speed=self.lane_circle_manager.circle_speed, pause=pause)
+            lane.show_sliders(height=height, speed=speed_per_frame, pause=pause)
 
     def clear_all_circles(self):
         for lane in self.lanes:
@@ -170,7 +177,7 @@ class LaneManager:
     def check_slider_key_input(self, lane):
         if circle_y := self.lanes[lane].check_sliders_if_hit(first_hit_window=self.lane_circle_manager.first_hit_window,
                                                              last_hit_window=self.lane_circle_manager.last_hit_window,
-                                                             speed=self.lane_circle_manager.circle_speed):
+                                                             speed=self.lane_circle_manager.circle_speed_per_second):
             return self.lane_circle_manager.determine_acc(circle_y)
 
     def restart(self):
@@ -207,9 +214,9 @@ class LaneCircleManager:
         return self.__display.height // self.__BOTTOM_CIRCLE_RATIO - self.__display.width // 20
 
     @property
-    def circle_speed(self):
+    def circle_speed_per_second(self):
         # FALLING_SPEED + self.circle_size // SPEED_RATIO
-        return 25
+        return 1500
 
     @property
     def interval(self):

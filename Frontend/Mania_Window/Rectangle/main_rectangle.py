@@ -8,7 +8,8 @@ from Frontend.Mania_Window.Stats.Show_Acc.show_acc import ShowAcc
 class Rectangle:
     __RECT_COLOR = Color.PURPLE
 
-    def __init__(self, *, show_acc, maps, display, combo_counter: ComboCounter, map_status, interval_timer):
+    def __init__(self, *, show_acc, maps, display, combo_counter: ComboCounter, map_status, interval_timer,
+                 delta_time_manager):
         self.__pos = RectanglePos(display=display)
         self.show_acc: ShowAcc = show_acc
         self.map_status = map_status
@@ -16,7 +17,8 @@ class Rectangle:
         self.rect = Rect(self.__pos.rectangle_x, 0, self.__pos.rectangle_width, self.__pos.rectangle_height)
         self.lane_manager: LaneManager = LaneManager(window=self.__pos.window, display=display,
                                                      rectangle_pos=self.__pos, map_manager=maps,
-                                                     interval_timer=interval_timer)
+                                                     interval_timer=interval_timer,
+                                                     delta_time_manager=delta_time_manager)
 
     def run(self, current_time: int, pause: bool):
         if not pause and not self.map_status.failed_or_finished:

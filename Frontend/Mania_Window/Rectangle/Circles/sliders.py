@@ -16,7 +16,7 @@ class Sliders(Circle):
     """
 
     def __init__(self, window, lane_x, min_slider_len, circle_image_manager, circle_size=DEFAULT_CIRCLE_SIZE):
-        super().__init__(circle_image_manager=circle_image_manager, circle_size=circle_size)
+        super().__init__(circle_image_manager=circle_image_manager)
         self.y = -100
         self.slider_head_hit_box = Rect(lane_x, self.y, circle_size, circle_size)
         self.slider_body_hit_box = Rect(lane_x + circle_size // 5.39, self.y, circle_size - circle_size // 2.92,
@@ -84,7 +84,6 @@ class Sliders(Circle):
     def __check_out_of_screen(self, height):
         if self.slider_tail_hit_box.y >= height:
             self.out = True
-            del self
 
     def hold_slider(self, speed):
         self.slider_body_hit_box.height -= speed

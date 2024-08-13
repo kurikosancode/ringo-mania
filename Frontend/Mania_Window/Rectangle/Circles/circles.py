@@ -1,6 +1,3 @@
-from Frontend.Settings import DEFAULT_CIRCLE_SIZE
-
-
 class Circle:
     def __init__(self, circle_image_manager):
         self.__circle_image_manager = circle_image_manager

@@ -31,13 +31,14 @@ class Lane:
         self.hitting_circle.change_size(size=size)
         self.hitting_circle.draw_circles(window=window, x=self.__x, y=hitting_circle_y)
 
-    def check_circles_if_out(self):
+    def check_circles_if_out(self) -> bool:
         for fall_circle in self.current_circles:
-            if fall_circle.out:
+            if fall_circle.out_of_bounds:
                 self.current_circles.remove(fall_circle)
                 return True
+        return False
 
-    def check_if_end_slider(self):
+    def check_if_end_slider(self) -> None:
         for slider in self.sliders:
             if slider.min_slider_len_finished:
                 slider.check_if_end_slider()
