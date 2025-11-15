@@ -1,0 +1,14 @@
+beautifulsoup4==4.12.3
+bs4==0.0.2
+certifi==2024.6.2
+charset-normalizer==3.3.2
+idna==3.7
+pycparser==2.22
+pygame==2.5.2
+pygame-animation==1.0.0
+pygame-scrollbar==1.1.0
+pygame-timer==1.0.0
+python-magic-bin==0.4.14
+requests==2.32.3
+soupsieve==2.5
+urllib3==2.2.1
